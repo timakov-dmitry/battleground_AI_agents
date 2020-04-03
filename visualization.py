@@ -1,5 +1,6 @@
 import pygame
 from world import World
+from constans import MAP_OBJECT_VALUES
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
@@ -27,7 +28,7 @@ class Visualisation:
                              (self.world.size[0] * self.CELL_SCALE, next_y * self.CELL_SCALE))
         for next_x in range(self.world.size[0]):
             for next_y in range(self.world.size[1]):
-                if self.world.map[next_x, next_y] == 8:
+                if self.world.map[next_x, next_y] == MAP_OBJECT_VALUES['OBSTACLE']:
                     self.vis_game.draw.rect(self.screen,
                                      self.COLORS['OBSTACLE'],
                                      (next_x*self.CELL_SCALE+1,

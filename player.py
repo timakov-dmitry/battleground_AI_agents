@@ -1,12 +1,13 @@
 from assets import ANIMALS_IMAGES
 from agent import Agent
+from world_object import WorldObject
 import numpy as np
 
 
-class Player:
+class Player(WorldObject):
     SENSE_RANGE = 3
 
-    def __init__(self, agent: Agent, position=[0, 0]):
+    def __init__(self, agent: Agent, position: list):
         self.position = position
         self.name = np.random.choice(ANIMALS_IMAGES)
         self.image_url = f'assets/{self.name}.png'
