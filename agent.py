@@ -21,13 +21,14 @@ class Agent:
 
     def get_available_directions(self) -> list:
         available_directions = []
-        if self.position[0]-1 > 0 and self.world_map[self.position[0]-1, self.position[1]] == MAP_OBJECT_VALUES['EMPTY']:
+        available_cells = [MAP_OBJECT_VALUES['EMPTY'], MAP_OBJECT_VALUES['FOOD']]
+        if self.position[0]-1 > 0 and self.world_map[self.position[0]-1, self.position[1]] in available_cells:
             available_directions.append('left')
-        if self.position[0]+1 < self.world_map.shape[0] and self.world_map[self.position[0]+1, self.position[1]] == MAP_OBJECT_VALUES['EMPTY']:
+        if self.position[0]+1 < self.world_map.shape[0] and self.world_map[self.position[0]+1, self.position[1]] in available_cells:
             available_directions.append('right')
-        if self.position[1]+1 < self.world_map.shape[1] and self.world_map[self.position[0], self.position[1]+1] == MAP_OBJECT_VALUES['EMPTY']:
+        if self.position[1]+1 < self.world_map.shape[1] and self.world_map[self.position[0], self.position[1]+1] in available_cells:
             available_directions.append('down')
-        if self.position[1]-1 > 0 and self.world_map[self.position[0], self.position[1]-1] == MAP_OBJECT_VALUES['EMPTY']:
+        if self.position[1]-1 > 0 and self.world_map[self.position[0], self.position[1]-1] in available_cells:
             available_directions.append('up')
         return available_directions
 

@@ -1,28 +1,39 @@
 from player import Player
 from food import Food
 from obstacle import Obstacle
+from typing import List
 import numpy as np
 from constans import MAP_OBJECT_VALUES
 
 
 class World:
+    players: List[Player] = []
+    foods: List[Food] = []
+    obstacles: List[Obstacle] = []
+
     def __init__(self, size=(10, 10)):
         self.size = size
         self.map = np.zeros(size).astype(int)
-        self.players = []
-        self.foods = []
-        self.obstacles = []
         print('World created')
 
     def __str__(self):
         print(self.map.T)
         return ''
 
+    @staticmethod
+    def log(message: str, message_type: str = 'info'):
+        print(f'{message_type.upper()} - {message}')
+
     def player_register(self, player: Player):
         self.players.append(player)
 
     def food_append(self, food: Food):
         self.foods.append(food)
+
+    def food_remove(self, position):
+        for food_index, food_item in enumerate(self.foods):
+            if food_item.position == position:
+                del self.foods[food_index]
 
     def add_obstacles(self, count=10):
         for obstacle in range(count):
@@ -59,8 +70,18 @@ class World:
             for other_player in self.players[index+1:]:
                 if player.new_position == other_player.new_position:
                     player.is_last_move_success = False
+
+    def do_players_moves(self):
+        for player in self.players:
             if player.is_last_move_success:
                 player.position = player.new_position
+                if self.map[player.new_position[0], player.new_position[1]] == MAP_OBJECT_VALUES["FOOD"]:
+                    player.score += 1
+                    World.log(f'Player {player.id} ({player.name}) eat the food in {player.position}')
+                    self.food_remove(player.new_position)
+
+
+
 
     def tick(self):
         # shuffle players turns
@@ -71,6 +92,7 @@ class World:
             next_direction = player.get_next_action()
             player.new_position = self.get_new_position(player, next_direction)
         self.check_players_turn_collisions()
+        self.do_players_moves()
         self.map_update()
 
 
