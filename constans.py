@@ -1,7 +1,7 @@
-MAP_OBJECT_VALUES = {
-    "PLAYER": 8,
+MAP_OBJECT_VALUES: dict = {
+    "PLAYER": -1,
     "OBSTACLE": 1,
-    "FOOD":  9,
+    "FOOD":  2,
     "EMPTY": 0
 }
-
+AVAILABLE_ACTION: list = ['left', 'right', 'up', 'down', 'stay']
