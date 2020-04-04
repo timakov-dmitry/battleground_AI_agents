@@ -1,3 +1,5 @@
+from typing import List
+from my_types import State
 from assets import ANIMALS_IMAGES
 from agent import Agent
 from world_object import WorldObject
@@ -8,14 +10,14 @@ import numpy as np
 
 class Player(WorldObject):
     score: int = 0
-    available_directions: list = []
     agent: Agent = None
     is_last_move_success: bool = False
-    world_map: np.array = []
+    world_map: np.ndarray = []
+    new_position: List[int] = []
 
-    def __init__(self, position: list, index: int):
+    def __init__(self, position: List[int], index: int):
         WorldObject.__init__(self, position)
-        self.id = index+5
+        self.id = index + 5
         self.name = ANIMALS_IMAGES[index]
         self.image_url = f'assets/{self.name}.png'
 
@@ -27,12 +29,12 @@ class Player(WorldObject):
         else:
             self.agent = agent
 
-    def update_state(self, world_map: np.array, position: list):
+    def update_state(self, world_map: np.ndarray, position: List[int]):
         self.world_map = world_map
         self.position = position
 
     @property
-    def state(self):
+    def state(self) -> State:
         return {
             "world_map": self.world_map,
             "position": self.position,
@@ -44,5 +46,5 @@ class Player(WorldObject):
         action = self.agent.get_next_action()
         if action not in AVAILABLE_ACTION:
             self.agent.log('Wrong action name', 'error')
-            return
+            return 'stay'
         return action

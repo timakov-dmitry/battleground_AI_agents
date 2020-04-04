@@ -1,7 +1,7 @@
+from typing import List, Tuple
 from player import Player
 from food import Food
 from obstacle import Obstacle
-from typing import List
 import numpy as np
 from constans import MAP_OBJECT_VALUES
 
@@ -11,17 +11,17 @@ class World:
     foods: List[Food] = []
     obstacles: List[Obstacle] = []
 
-    def __init__(self, size=(10, 10)):
+    def __init__(self, size: Tuple[int, int] = (10, 10)):
         self.size = size
-        self.map = np.zeros(size).astype(int)
+        self.map: np.ndarray = np.zeros(size).astype(int)
         print('World created')
 
-    def __str__(self):
+    def __str__(self) -> str:
         print(self.map.T)
         return ''
 
     @staticmethod
-    def log(message: str, message_type: str = 'info'):
+    def log(message: str, message_type: str = 'info') -> None:
         print(f'{message_type.upper()} - {message}')
 
     def player_register(self, player: Player):
@@ -30,12 +30,12 @@ class World:
     def food_append(self, food: Food):
         self.foods.append(food)
 
-    def food_remove(self, position):
+    def food_remove(self, position: List[int]):
         for food_index, food_item in enumerate(self.foods):
             if food_item.position == position:
                 del self.foods[food_index]
 
-    def add_obstacles(self, count=10):
+    def add_obstacles(self, count: int = 10):
         for obstacle in range(count):
             obstacle_position = [np.random.randint(0, self.size[0]), np.random.randint(0, self.size[1])]
             self.obstacles.append(Obstacle(obstacle_position))
@@ -50,7 +50,7 @@ class World:
             self.map[obstacle.position[0], obstacle.position[1]] = MAP_OBJECT_VALUES['OBSTACLE']
 
     @staticmethod
-    def get_new_position(player: Player, next_direction: list):
+    def get_new_position(player: Player, next_direction: str):
         x, y = player.position
         if next_direction == 'left':
             x = player.position[0] - 1
@@ -77,11 +77,8 @@ class World:
                 player.position = player.new_position
                 if self.map[player.new_position[0], player.new_position[1]] == MAP_OBJECT_VALUES["FOOD"]:
                     player.score += 1
-                    World.log(f'Player {player.id} ({player.name}) eat the food in {player.position}')
+                    World.log(f'Player {player.id} ({player.name}) eat the food in {player.position}. Player score {player.score} points')
                     self.food_remove(player.new_position)
-
-
-
 
     def tick(self):
         # shuffle players turns

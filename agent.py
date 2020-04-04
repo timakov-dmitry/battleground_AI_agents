@@ -1,9 +1,12 @@
+from typing import List, Dict
+from my_types import State
 import numpy as np
 from constans import MAP_OBJECT_VALUES
+import numpy as np
 
 
 class Agent:
-    position: list = None
+    position: List[int] = None
     world_map: np.array
     score: int = 0
 
@@ -11,10 +14,10 @@ class Agent:
         self.log('Bot started', 'info')
 
     @staticmethod
-    def log(message: str, message_type: str):
+    def log(message: str, message_type: str) -> None:
         print(f'{message_type.upper() } - {message}')
 
-    def update_state(self, state: dict):
+    def update_state(self, state: State):
         self.position = state["position"]
         self.world_map = state["world_map"]
         self.score = state["score"]
@@ -32,5 +35,5 @@ class Agent:
             available_directions.append('up')
         return available_directions
 
-    def get_next_action(self):
+    def get_next_action(self) -> str:
         return 'stay'
