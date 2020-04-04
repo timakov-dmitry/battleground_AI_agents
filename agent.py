@@ -17,7 +17,7 @@ class Agent:
     def log(message: str, message_type: str) -> None:
         print(f'{message_type.upper() } - {message}')
 
-    def update_state(self, state: State):
+    def update_state(self, state):
         self.position = state["position"]
         self.world_map = state["world_map"]
         self.score = state["score"]

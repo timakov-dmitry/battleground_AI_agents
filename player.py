@@ -28,13 +28,14 @@ class Player(WorldObject):
             self.agent = random_agent
         else:
             self.agent = agent
+        print(f'Player {self.id} using {agent.__class__.__name__}')
 
     def update_state(self, world_map: np.ndarray, position: List[int]):
         self.world_map = world_map
         self.position = position
 
     @property
-    def state(self) -> State:
+    def state(self):
         return {
             "world_map": self.world_map,
             "position": self.position,

@@ -1,8 +1,8 @@
-from typing import TypedDict, List
+from typing import NamedTuple, List
 import numpy as np
 
 
-class State(TypedDict):
+class State(NamedTuple):
     world_map: np.ndarray
     position: List[int]
     score: int
