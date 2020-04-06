@@ -16,6 +16,17 @@ class World:
         self.map: np.ndarray = np.zeros(size).astype(int)
         print('World created')
 
+    def is_valid_position(self, position: List[int]):
+        return position[0] in range(self.size[0]) and position[1] in range(self.size[1])
+
+    def is_empty(self, position: List[int]) -> bool:
+        return self.map[position[0], position[1]] == MAP_OBJECT_VALUES['EMPTY']
+
+    def is_obstacle(self, position: List[int]) -> bool:
+        if not self.is_valid_position(position):
+            return False
+        return self.map[position[0], position[1]] == MAP_OBJECT_VALUES['OBSTACLE']
+
     def __str__(self) -> str:
         print(self.map.T)
         return ''
@@ -28,23 +39,34 @@ class World:
         self.players.append(player)
 
     def add_food(self, count: int = 10, food_position: List[int] = None):
-        for food in range(count):
+        for index in range(count):
             if not food_position:
                 position = [np.random.randint(0, self.size[0]), np.random.randint(0, self.size[1])]
-                self.foods.append(Food(position))
+                if self.is_empty(position):
+                    self.foods.append(Food(position))
+                else:
+                    index -= 1
             else:
                 self.foods.append(Food(food_position))
 
-    def food_remove(self, position: List[int]):
+    def delete_food(self, position: List[int]):
         for food_index, food_item in enumerate(self.foods):
             if food_item.position == position:
                 del self.foods[food_index]
 
+    def delete_obstacle(self, position: List[int]):
+        for obstacle_index, obstacle_item in enumerate(self.foods):
+            if obstacle_item.position == position:
+                del self.foods[obstacle_index]
+
     def add_obstacles(self, count: int = 1, obstacle_position: List[int] = None):
-        for obstacle in range(count):
+        for index in range(count):
             if not obstacle_position:
                 position = [np.random.randint(0, self.size[0]), np.random.randint(0, self.size[1])]
-                self.obstacles.append(Obstacle(position))
+                if self.is_empty(position):
+                    self.obstacles.append(Obstacle(position))
+                else:
+                    index -= 1
             else:
                 self.obstacles.append(Obstacle(obstacle_position))
 
@@ -73,16 +95,17 @@ class World:
         return [x, y]
 
     def check_players_turn_collisions(self):
+        for player in self.players:
+            if self.is_obstacle(player.new_position) and (player.obstacle_count < 1):
+                player.is_last_move_success = False
+
         for index, player in enumerate(self.players):
-            player.is_last_move_success = True
             for other_player in self.players[index+1:]:
                 if player.new_position == other_player.new_position:
                     player.is_last_move_success = False
 
         for player in self.players:
-            if player.new_position[0] not in range(self.size[0]):
-                player.is_last_move_success = False
-            if player.new_position[1] not in range(self.size[1]):
+            if not self.is_valid_position(player.new_position):
                 player.is_last_move_success = False
 
     def check_players_action_collisions(self):
@@ -97,10 +120,15 @@ class World:
                     self.add_obstacles(1, player.position)
                     player.build_obstacle()
 
-                player.position = player.new_position
+                if self.is_obstacle(player.new_position):
+                    self.delete_obstacle(player.new_position)
+                    player.destroy_obstacle()
+
                 if self.map[player.new_position[0], player.new_position[1]] == MAP_OBJECT_VALUES["FOOD"]:
                     player.eat_food()
-                    self.food_remove(player.new_position)
+                    self.delete_food(player.new_position)
+
+                player.position = player.new_position
 
     def tick(self):
         # shuffle players turns
@@ -120,7 +148,7 @@ class World:
     def finish(self):
         self.players = sorted(self.players, key=lambda p: p.score)
         for player in self.players:
-            print(f'Player "{player.name}" has {player.score} points')
+            print(f'Player "{player.name}" has {player.score} points. Player has {player.obstacle_count} construction points')
         print(f'{self.players[-1].name}  - WINNER!')
 
 

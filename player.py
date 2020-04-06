@@ -49,6 +49,10 @@ class Player(WorldObject):
         self.obstacle_count -= 1
         self.log(f'Player {self.id} ({self.name}) build obstacle in {self.position}', 'info')
 
+    def destroy_obstacle(self):
+        self.obstacle_count -= 1
+        self.log(f'Player {self.id} ({self.name}) destroyed obstacle in {self.position}', 'info')
+
     @property
     def state(self):
         return {
