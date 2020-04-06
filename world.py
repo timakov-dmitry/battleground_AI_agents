@@ -27,18 +27,26 @@ class World:
     def player_register(self, player: Player):
         self.players.append(player)
 
-    def food_append(self, food: Food):
-        self.foods.append(food)
+    def add_food(self, count: int = 10, food_position: List[int] = None):
+        for food in range(count):
+            if not food_position:
+                position = [np.random.randint(0, self.size[0]), np.random.randint(0, self.size[1])]
+                self.foods.append(Food(position))
+            else:
+                self.foods.append(Food(food_position))
 
     def food_remove(self, position: List[int]):
         for food_index, food_item in enumerate(self.foods):
             if food_item.position == position:
                 del self.foods[food_index]
 
-    def add_obstacles(self, count: int = 10):
+    def add_obstacles(self, count: int = 1, obstacle_position: List[int] = None):
         for obstacle in range(count):
-            obstacle_position = [np.random.randint(0, self.size[0]), np.random.randint(0, self.size[1])]
-            self.obstacles.append(Obstacle(obstacle_position))
+            if not obstacle_position:
+                position = [np.random.randint(0, self.size[0]), np.random.randint(0, self.size[1])]
+                self.obstacles.append(Obstacle(position))
+            else:
+                self.obstacles.append(Obstacle(obstacle_position))
 
     def map_update(self):
         self.map = np.zeros(self.size).astype(int)
@@ -50,17 +58,17 @@ class World:
             self.map[obstacle.position[0], obstacle.position[1]] = MAP_OBJECT_VALUES['OBSTACLE']
 
     @staticmethod
-    def get_new_position(player: Player, next_direction: str):
+    def get_new_position(player: Player):
         x, y = player.position
-        if next_direction == 'left':
+        if player.next_action == 'left':
             x = player.position[0] - 1
-        if next_direction == 'right':
+        if player.next_action == 'right':
             x = player.position[0] + 1
-        if next_direction == 'up':
+        if player.next_action == 'up':
             y = player.position[1] - 1
-        if next_direction == 'down':
+        if player.next_action == 'down':
             y = player.position[1] + 1
-        if next_direction == 'stay':
+        if player.next_action == 'stay':
             pass
         return [x, y]
 
@@ -71,13 +79,27 @@ class World:
                 if player.new_position == other_player.new_position:
                     player.is_last_move_success = False
 
+        for player in self.players:
+            if player.new_position[0] not in range(self.size[0]):
+                player.is_last_move_success = False
+            if player.new_position[1] not in range(self.size[1]):
+                player.is_last_move_success = False
+
+    def check_players_action_collisions(self):
+        for player in self.players:
+            if player.next_action == 'build' and player.obstacle_count < 1:
+                player.is_last_move_success = False
+
     def do_players_moves(self):
         for player in self.players:
             if player.is_last_move_success:
+                if player.next_action == 'build':
+                    self.add_obstacles(1, player.position)
+                    player.build_obstacle()
+
                 player.position = player.new_position
                 if self.map[player.new_position[0], player.new_position[1]] == MAP_OBJECT_VALUES["FOOD"]:
-                    player.score += 1
-                    World.log(f'Player {player.id} ({player.name}) eat the food in {player.position}. Player score {player.score} points')
+                    player.eat_food()
                     self.food_remove(player.new_position)
 
     def tick(self):
@@ -86,10 +108,19 @@ class World:
         # ask new players positions
         for player in self.players:
             player.update_state(self.map, player.position)
-            next_direction = player.get_next_action()
-            player.new_position = self.get_new_position(player, next_direction)
+            player.next_action = player.get_next_action()
+            player.new_position = self.get_new_position(player)
+            player.is_last_move_success = True
+
+        self.check_players_action_collisions()
         self.check_players_turn_collisions()
         self.do_players_moves()
         self.map_update()
+
+    def finish(self):
+        self.players = sorted(self.players, key=lambda p: p.score)
+        for player in self.players:
+            print(f'Player "{player.name}" has {player.score} points')
+        print(f'{self.players[-1].name}  - WINNER!')
 
 

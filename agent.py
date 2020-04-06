@@ -8,20 +8,21 @@ import numpy as np
 class Agent:
     position: List[int] = None
     world_map: np.array
+    player = None
     score: int = 0
 
     def __init__(self):
-        self.log('Bot started', 'info')
+        pass
 
-    @staticmethod
-    def log(message: str, message_type: str) -> None:
-        print(f'{message_type.upper() } - {message}')
+    def connect_player(self, player):
+        self.player = player
 
     def update_state(self, state):
         self.position = state["position"]
         self.world_map = state["world_map"]
         self.score = state["score"]
 
+    # this can be override in agent inheritor
     def get_available_directions(self) -> list:
         available_directions = []
         available_cells = [MAP_OBJECT_VALUES['EMPTY'], MAP_OBJECT_VALUES['FOOD']]
@@ -35,5 +36,6 @@ class Agent:
             available_directions.append('up')
         return available_directions
 
+    # this mast be override in agent inheritor
     def get_next_action(self) -> str:
         return 'stay'

@@ -6,4 +6,4 @@ MAP_OBJECT_VALUES: Dict = {
     "FOOD":  2,
     "EMPTY": 0
 }
-AVAILABLE_ACTION: List[str] = ['left', 'right', 'up', 'down', 'stay']
+AVAILABLE_ACTION: List[str] = ['left', 'right', 'up', 'down', 'stay', 'build']

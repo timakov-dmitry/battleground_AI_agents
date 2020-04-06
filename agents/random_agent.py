@@ -7,5 +7,7 @@ class RandomAgent(Agent):
         super().__init__()
 
     def get_next_action(self):
-        available_directions = self.get_available_directions()
-        return 'stay' if len(available_directions) < 1 else np.random.choice(available_directions)
+        available_actions = self.get_available_directions()
+        if self.player.obstacle_count > 0:
+            available_actions.append('build')
+        return 'stay' if len(available_actions) < 1 else np.random.choice(available_actions)
