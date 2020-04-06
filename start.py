@@ -14,6 +14,7 @@ COUNT_FOOD = 20
 COUNT_OBSTACLES = 50
 COUNT_EPOCH = 200
 APPEAR_NEW_FOOD_EPOCH = 1
+VISUALIZATION_SPEED = 0.2
 IS_VISUALISATION = True
 
 agents = [LeftAgent, StayAgent, RandomAgent]
@@ -49,7 +50,7 @@ while running and counter < COUNT_EPOCH:
     counter += 1
     if counter % APPEAR_NEW_FOOD_EPOCH == 0:
         world.add_food(1)
-    time.sleep(0.1)
+    time.sleep(VISUALIZATION_SPEED)
 
 world.finish()
 if IS_VISUALISATION:
